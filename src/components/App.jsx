@@ -9,13 +9,22 @@ class App extends Component {
         super(props);
         this.state = {
             text: '',
-            dueDate: moment(new Date()).utc().add(1, 'd').format()
+            dueDate: '',
+            timeIn15Mins: moment().add(15, 'm').format('YYYY-MM-DDTHH:mm')
         }
     }
 
     addReminder() {
         // console.log('this.state.dueDate', this.state.dueDate);
-        this.props.addReminder(this.state.text, this.state.dueDate);
+        const timeIn15Mins = this.state.timeIn15Mins;
+        if (this.state.dueDate === '') {
+            this.setState({
+                dueDate: timeIn15Mins
+            });
+            this.props.addReminder(this.state.text, timeIn15Mins);
+        } else {
+            this.props.addReminder(this.state.text, this.state.dueDate);
+        }
         this.setState({text: ''});
     }
 
@@ -67,9 +76,9 @@ class App extends Component {
                             className="form-control"
                             type="datetime-local"
                             onChange={e => {
-                                this.setState({ dueDate: e.target.value });
-                                console.log(e.target.value);
+                                this.setState({ dueDate: e.target.value })
                             }}
+                            value={this.state.timeIn15Mins}
                         />
                         <button
                             type="button"
