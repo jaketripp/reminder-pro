@@ -12,20 +12,38 @@ class App extends Component {
             dueDate: '',
             timeIn15Mins: moment().add(15, 'm').format('YYYY-MM-DDTHH:mm')
         }
+        setInterval(() => {
+            this.checkDeadlines(this.props.reminders);
+        }, 300000);
+    }
+    
+    // find a better way to join them (using '&' for the last one)
+    // use a modal?
+    checkDeadlines(remindersArr) {
+        let dueSoon = [];
+        for (let i = 0; i < remindersArr.length; i++) {
+            let diff = moment(new Date()).diff(remindersArr[0].dueDate);
+            console.log(diff);
+            if (diff > -900000 && diff < 0) {
+                dueSoon.push(remindersArr[i].text)
+            }
+        }
+        if (dueSoon.length > 0) {
+            alert(`Get working! "${dueSoon.join('", "')}" should be done soon!`);
+        }
     }
 
     addReminder() {
-        // console.log('this.state.dueDate', this.state.dueDate);
-        const timeIn15Mins = this.state.timeIn15Mins;
-        if (this.state.dueDate === '') {
+        const { timeIn15Mins, dueDate, text } = this.state;
+        if (dueDate === '') {
             this.setState({
                 dueDate: timeIn15Mins
             });
-            this.props.addReminder(this.state.text, timeIn15Mins);
+            this.props.addReminder(text, timeIn15Mins);
         } else {
-            this.props.addReminder(this.state.text, this.state.dueDate);
+            this.props.addReminder(text, dueDate);
         }
-        this.setState({text: ''});
+        this.setState({ text: '' });
     }
 
     deleteReminder(id) {
@@ -63,7 +81,10 @@ class App extends Component {
                 <div className="title">
                     Reminder Pro
                 </div>
-                <div className="form-inline reminder-form">
+                <form className="form-inline reminder-form" onSubmit={e => {
+                    e.preventDefault();
+                    this.addReminder();
+                }}>
                     <div className="form-group">
                         <input
                             autoFocus
@@ -78,16 +99,16 @@ class App extends Component {
                             onChange={e => {
                                 this.setState({ dueDate: e.target.value })
                             }}
-                            value={this.state.timeIn15Mins}
+                            value={this.state.dueDate !== '' ? this.state.dueDate : this.state.timeIn15Mins}
                         />
                         <button
-                            type="button"
+                            type="submit"
                             className="btn btn-success"
                             onClick={() => this.addReminder()}
                             disabled={!this.state.text}
                         >Add Reminder</button>
                     </div>
-                </div>
+                </form>
                 {this.renderReminders()}
                 <div
                     className="btn btn-danger"
