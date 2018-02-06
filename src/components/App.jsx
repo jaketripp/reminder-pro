@@ -12,6 +12,9 @@ class App extends Component {
             dueDate: '',
             timeIn15Mins: moment().add(15, 'm').format('YYYY-MM-DDTHH:mm')
         }
+        setTimeout(() => {
+            this.checkDeadlines(this.props.reminders);
+        }, 10000);
         setInterval(() => {
             this.checkDeadlines(this.props.reminders);
         }, 300000);
